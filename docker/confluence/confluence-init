@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# confluence
+#
+#
+# chkconfig: - 85 15
+# description: Confluence documentation
+# processname: java
+# pidfile: /opt/confluence/work/catalina.pid 
+
+CONFLUENCE_HOME='/opt/confluence'
+PID=`cat $CONFLUENCE_HOME/work/catalina.pid`
+
+case "$1" in
+        start)
+                $CONFLUENCE_HOME/bin/start-confluence.sh
+                ;;
+        stop)
+                $CONFLUENCE_HOME/bin/stop-confluence.sh
+                ;;
+        restart)
+                $0 stop
+                sleep 5
+                $0 start
+                ;;
+        status)
+                ps -ef|grep -q `cat $CONFLUENCE_HOME/work/catalina.pid` && echo "Confluence ( pid $PID ) is running" || echo "Confluence is not running"
+                ;;
+        *)
+                echo "Usage: $0 start|stop"
+                ;;
+esac
