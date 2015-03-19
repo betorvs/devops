@@ -13,10 +13,10 @@ then
     then
       ARCH=`grep Arch $SPEC |awk '{print $2}'`
       echo "defined $ARCH"
+  else
+    ARCH="x86_64"
+    echo "defined $ARCH"
   fi
-else
-  ARCH="x86_64"
-  echo "defined $ARCH"
 fi
 
 DISTS="centos:centos6"
