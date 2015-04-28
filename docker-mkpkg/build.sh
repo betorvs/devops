@@ -7,6 +7,7 @@ PACKAGE="$2"
 TARGZ="$3"
 ARCH="$4"
 
+
 if [ -n $ARCH ];
 then
   if grep -q Arch $SPEC 
@@ -18,6 +19,8 @@ then
     echo "defined $ARCH"
   fi
 fi
+
+REQUIRES=`grep -m 1 requires $SPEC |awk '{ print substr($0, index($0,$3)) }'`
 
 DISTS="centos:centos6"
 mkdir -p $PACKAGE
@@ -32,6 +35,11 @@ set -x
 # Yum
 yum --nogpgcheck -y upgrade
 yum --nogpgcheck -y install rpm-build createrepo tar
+
+if [ -n \"$REQUIRES\" ]; then
+	echo \"yum --nogpgcheck -y install $REQUIRES\"
+	yum --nogpgcheck -y install $REQUIRES
+fi
 
 # Prepare build dir
 cd /tmp
