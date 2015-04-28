@@ -2,6 +2,11 @@
 set -o errexit
 set -o pipefail
 
+if [ "$#" -lt "3" ]; then
+ echo "Use: $0 Spec.file dir.package targz.file arch"
+ exit 1
+fi
+
 SPEC="$1"
 PACKAGE="$2"
 TARGZ="$3"
