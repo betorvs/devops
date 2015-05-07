@@ -33,10 +33,18 @@ cp /tmp/pdns/pdnsadmin2.7 /usr/sbin/pdnsadmin && chmod +x /usr/sbin/pdnsadmin
 
 newhost() {
 
+if [ "$#" -eq "5" ]; then
+ VLAN=$1
+ HOSTNAME=$2
+ IFACE=$3
+ MAC=$4
+ TYPE=$5
+else 
+
 echo "Defina VLAN:"
 read VLAN
 
-echo "Defina o HOSTNAME:"
+echo "Defina o HOSTNAME (Use FQDN!):"
 read HOSTNAME
 
 echo "Entre com a interface (ex. eth0):"
@@ -44,6 +52,15 @@ read IFACE
 
 echo "Entre o MAC da interface:"
 read MAC
+
+echo "Type(use 10 if you dont knows): "
+read TYPE
+
+fi
+
+if [ -z $TYPE ]; then
+ TYPE="10"
+fi
 
 echo $MAC |grep -q "^\([0-9A-Fa-f]\{2\}:\)\{5\}[0-9A-Fa-f]\{2\}$" || exit 2
 
@@ -64,12 +81,12 @@ fi
 IP_FREE=`dcm.pl -r subnet_nextip subnet=$VLAN  output=dotted`
 #Adiciona o host e aloca ip na vlan
 echo "add $HOSTNAME na VLAN $VLAN"
-dcm.pl -r host_add host=$HOSTNAME type=10 ip=$IP_FREE mac=$MAC name=$IFACE notes=https://puppetmaster.oi.infra/hosts/$HOSTNAME
+echo "dcm.pl -r host_add host=$HOSTNAME type=$TYPE ip=$IP_FREE mac=$MAC name=$IFACE notes=https://puppetmaster.oi.infra/hosts/$HOSTNAME"
 if [ $? = 0 ] ; then
  echo "add DNS A record"
- /usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE
+ echo "/usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE"
  echo "add DNS PTR record"
- /usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa 
+ echo "/usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa "
 else
  echo "Dont create DNS records because command dcm.pl host_add with problems"
 fi 
@@ -102,7 +119,7 @@ case $1 in
 		search $2;
 		;;
 	new)
-		newhost;
+		newhost $2 $3 $4 $5 $6;
 		;;
 		
 	*)
@@ -112,8 +129,13 @@ case $1 in
 		echo ""
 		echo "Usage: $0 search HOSTNAME -> Use to search a name in ipmgmt and dns. If you dont set a hostname, it ask you!"
 		echo ""
-		echo "Usage: $0 new -> To create a new hostname in ipmgmt and dns, with interface type \"(VMware, vm - Centos (server)\""
+		echo "Usage: $0 new -> To create a new hostname in ipmgmt and dns"
 		echo "Attention!!! You need a MAC Address to config a hostname in ipmgmt.oi.infra"
+		echo "For interface type \"(VMware, vm - Centos (server)\" = 10"
+		echo "For interface type \"(Juniper, Juniper (router))\" = 11"
+		echo "For interface type \"(Dell, R610 (server))\" = 9"
+		echo ""
+		echo "Usage: $0 new VLAN HOSTNAME INTERFACE MAC-ADDRESS TYPE"
 		echo ""
 		;;
 esac
