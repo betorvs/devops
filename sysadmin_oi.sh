@@ -38,6 +38,11 @@ MAC=$1
 VLAN=$2
 
 echo $MAC |grep -q "^\([0-9A-Fa-f]\{2\}:\)\{5\}[0-9A-Fa-f]\{2\}$" || exit 5
+dcm.pl -r interface_display interface=$MAC 1>/dev/null
+if [ $? = 0 ]; then
+ echo "$MAC in use!"
+ exit 5
+fi
 
 ##Se a vlan nao existe, para por aqui
 dcm.pl -r subnet_display subnet=$VLAN 1>/dev/null
@@ -132,7 +137,7 @@ fi
 if [ -z $TYPE ]; then
  TYPE="10"
 fi
-echo $HOSTNAME
+
 validate $MAC $VLAN
 dcm.pl -r host_display host=$HOSTNAME 1>/dev/null
 if [ $? = 2 ] ; then
@@ -142,6 +147,31 @@ fi
 IP_FREE=`dcm.pl -r subnet_nextip subnet=$VLAN  output=dotted`
 echo "add interface=$IFACE on $HOSTNAME with $IP_FREE "
 echo "dcm.pl -r interface_add host=$HOSTNAME type=$TYPE ip=$IP_FREE name=$IFACE mac=$MAC"
+
+}
+
+deletehost() {
+
+if [ -z $1 ]; then
+ echo "Enter Hostname to DELETE!:"
+ read HOSTNAME
+else
+ HOSTNAME=$1
+fi
+
+dcm.pl -r host_display host=$HOSTNAME 1>/dev/null
+if [ $? = 2 ] ; then
+ echo "Dont find this hostname: $HOSTNAME !"
+ exit 2
+fi
+
+IPS=`dcm.pl -r host_display host=$HOSTNAME| grep "ip_addr " |awk '{ print $2}'`
+for ip in $IPS; do
+ IP_FREE=`echo $ip`
+ echo "/usr/sbin/pdnsadmin --remove -t A -n $HOSTNAME -c $IP_FREE"
+ echo "/usr/sbin/pdnsadmin --remove -t PTR -n $IP_FREE -c $HOSTNAME"
+done 
+ echo "dcm.pl -r host_del host=$HOSTNAME"
 
 }
 
@@ -163,6 +193,7 @@ echo "searching $HOSTNAME in DNS records"
 
 }
 
+
 case $1 in
 	install)
 		instalar;
@@ -173,8 +204,11 @@ case $1 in
 	new)
 		newhost $2 $3 $4 $5 $6;
 		;;
-	add)
+	addif)
 		newinterface $2 $3 $4 $5 $6;
+		;;
+	del)
+		deletehost $2;
 		;;
 		
 	*)
@@ -192,7 +226,9 @@ case $1 in
 		echo ""
 		echo "Usage: $0 new VLAN HOSTNAME INTERFACE MAC-ADDRESS TYPE"
 		echo ""
-		echo "Usage: $0 add -> To add new interface in ipmgmt.oi.infra"
+		echo "Usage: $0 addif -> To add new interface in ipmgmt.oi.infra"
+		echo ""
+		echo "Usage: $0 del -> To delete a hostname in ipmgmt.oi.infra and dns"
 		echo ""
 		;;
 esac
