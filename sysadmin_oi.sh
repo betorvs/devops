@@ -65,11 +65,14 @@ IP_FREE=`dcm.pl -r subnet_nextip subnet=$VLAN  output=dotted`
 #Adiciona o host e aloca ip na vlan
 echo "add $HOSTNAME na VLAN $VLAN"
 dcm.pl -r host_add host=$HOSTNAME type=10 ip=$IP_FREE mac=$MAC name=$IFACE notes=https://puppetmaster.oi.infra/hosts/$HOSTNAME
-
-echo "add DNS A record"
-/usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE
-echo "add DNS PTR record"
-/usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa 
+if [ $? = 0 ] ; then
+ echo "add DNS A record"
+ /usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE
+ echo "add DNS PTR record"
+ /usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa 
+else
+ echo "Dont create DNS records because command dcm.pl host_add with problems"
+fi 
 
 }
 
