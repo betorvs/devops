@@ -1,5 +1,7 @@
 #!/bin/bash
-
+#
+# script versão 1.0 - roberto.scudeller
+#
 instalar() {
 
 mkdir -p /etc/dcm
