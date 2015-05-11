@@ -98,9 +98,11 @@ echo "add $HOSTNAME na VLAN $VLAN"
  echo "dcm.pl -r host_add host=$HOSTNAME type=$TYPE ip=$IP_FREE mac=$MAC name=$IFACE notes=https://puppetmaster.oi.infra/hosts/$HOSTNAME"
 if [ $? = 0 ] ; then
  echo "add DNS A record"
- echo " /usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE"
+ #echo " /usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE"
+ /usr/sbin/pdnsadmin --add -t A -n $HOSTNAME -c $IP_FREE
  echo "add DNS PTR record"
- echo " /usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa"
+ #echo " /usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa"
+ /usr/sbin/pdnsadmin --add -t PTR -n $IP_FREE -c $HOSTNAME -z 10.in-addr.arpa
 else
  echo "Dont create DNS records because command dcm.pl host_add with problems"
 fi 
@@ -146,7 +148,8 @@ if [ $? = 2 ] ; then
 fi
 IP_FREE=`dcm.pl -r subnet_nextip subnet=$VLAN  output=dotted`
 echo "add interface=$IFACE on $HOSTNAME with $IP_FREE "
-echo "dcm.pl -r interface_add host=$HOSTNAME type=$TYPE ip=$IP_FREE name=$IFACE mac=$MAC"
+#echo "dcm.pl -r interface_add host=$HOSTNAME type=$TYPE ip=$IP_FREE name=$IFACE mac=$MAC"
+dcm.pl -r interface_add host=$HOSTNAME type=$TYPE ip=$IP_FREE name=$IFACE mac=$MAC
 
 }
 
@@ -168,10 +171,13 @@ fi
 IPS=`dcm.pl -r host_display host=$HOSTNAME| grep "ip_addr " |awk '{ print $2}'`
 for ip in $IPS; do
  IP_FREE=`echo $ip`
- echo "/usr/sbin/pdnsadmin --remove -t A -n $HOSTNAME -c $IP_FREE"
- echo "/usr/sbin/pdnsadmin --remove -t PTR -n $IP_FREE -c $HOSTNAME"
+ #echo "/usr/sbin/pdnsadmin --remove -t A -n $HOSTNAME -c $IP_FREE"
+ /usr/sbin/pdnsadmin --remove -t A -n $HOSTNAME -c $IP_FREE
+ #echo "/usr/sbin/pdnsadmin --remove -t PTR -n $IP_FREE -c $HOSTNAME"
+ /usr/sbin/pdnsadmin --remove -t PTR -n $IP_FREE -c $HOSTNAME
 done 
- echo "dcm.pl -r host_del host=$HOSTNAME"
+ #echo "dcm.pl -r host_del host=$HOSTNAME"
+ dcm.pl -r host_del host=$HOSTNAME
 
 }
 
