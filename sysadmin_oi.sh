@@ -201,6 +201,25 @@ echo "searching $HOSTNAME in DNS records"
 
 }
 
+nextip() {
+
+if [ -z $1 ]; then
+ echo "Defina a VLAN:"
+ read VLAN
+ else 
+ VLAN=$1
+fi
+
+##Se a vlan nao existe, para por aqui
+dcm.pl -r subnet_display subnet=$VLAN 1>/dev/null
+if [ $? = 2 ] ; then
+        echo "VLAN NAO EXISTE. Verifique o nome correto!"
+        exit 2
+fi
+IP_FREE=`dcm.pl -r subnet_nextip subnet=$VLAN  output=dotted`
+echo "Proximo IP da VLAN $VLAN : $IP_FREE"
+
+}
 
 case $1 in
 	install)
@@ -218,13 +237,17 @@ case $1 in
 	del)
 		deletehost $2;
 		;;
-		
+	nextip)
+		nextip $2;
+		;;		
 	*)
 		echo "Usage: $0 (install|search|new|add)"
 		echo ""
 		echo "Usage: $0 install -> Use to install packages pdnsadmin and dcm.pl"
 		echo ""
 		echo "Usage: $0 search HOSTNAME -> Use to search a name in ipmgmt and dns. If you dont set a hostname, it ask you!"
+		echo ""
+		echo "Usage: $0 nextip VLAN -> Show the next free ip from VLAN"
 		echo ""
 		echo "Usage: $0 new -> To create a new hostname in ipmgmt and dns"
 		echo "Attention!!! You need a MAC Address to config a hostname in ipmgmt.oi.infra"
