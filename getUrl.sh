@@ -12,7 +12,7 @@ fi
 
 date
 for a in `seq 1 $TIME`; do
- curl "$URL" 2>/dev/null |grep "$GREP" >/dev/null && echo "tentativa N $a : [  OK  ]"
+ curl "$URL" 2>/dev/null |grep "$GREP" >/dev/null && echo "tentativa N $a : [  OK  ]" || echo "ERROR tentativa N $a" 
  sleep 1
 done
 date
