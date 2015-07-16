@@ -2,4 +2,19 @@
 
 DIR="$PWD/$1"
 
-docker run --rm -t -v $DIR:/vol -i centos:centos6 /bin/bash
+case $2 in 
+  "centos6")
+    $SO="centos:centos6"
+    ;;
+  "centos5")
+    $SO="centos:centos5"
+    ;;
+   "debian")
+    $SO="debian:wheezy"
+   ;;
+   *)
+    $SO="centos:centos6"
+   ;;
+
+esac
+docker run --rm -t -v $DIR:/vol -i $SO /bin/bash
