@@ -18,3 +18,4 @@ case $2 in
 
 esac
 echo "docker run --rm -t -v $DIR:/vol -i $SO /bin/bash"
+docker run --rm -t -v $DIR:/vol -i $SO /bin/bash
