@@ -1,0 +1,11 @@
+{
+  "handlers": {
+      "severities": [
+        "warning",
+        "critical",
+        "unknown"
+      ],
+      "command": "/opt/sensu/embedded/bin/ruby /etc/sensu/handlers/coopera.rb",
+      "type": "pipe"
+    }
+}

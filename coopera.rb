@@ -7,6 +7,7 @@
 
 require 'sensu-handler'
 require 'json'
+require 'openssl'
 
 class Coopera < Sensu::Handler
   option :json_config,
@@ -45,15 +46,15 @@ class Coopera < Sensu::Handler
 
   def handle
     description = @event['check']['notification'] || build_description
-    post_data("Check\n#{incident_key}\nDescription\n#{description}")
+    post_data("Check #{incident_key} Description #{description}")
   end
 
   def build_description
     [
       @event['check']['output'].strip,
       @event['client']['address'],
-      @event['client']['subscriptions'].join(',')
-    ].join(' : ')
+      @event['client']['subscriptions'].join(' ')
+    ].join(' ')
   end
 
   def post_data(notice)
@@ -66,12 +67,14 @@ class Coopera < Sensu::Handler
     end
 
     http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE if http.use_ssl?
 
-    req = Net::HTTP::Post.new("#{uri.path}?#{uri.query}")
+    req = Net::HTTP::Post.new("#{uri.path}?#{uri.query}", initheader = {'Content-Type' =>'application/json'})
+
     text = notice
     req.body = payload(text).to_json
-
-    response = http_response(req)
+    puts req.body
+    response = http.request(req)
     verify_response(response)
   end
 
@@ -86,16 +89,11 @@ class Coopera < Sensu::Handler
 
   def payload(notice)
     {
-      "incident": {
-        "description": [coopera_message_prefix, notice].compact.join(' '),
-        "summary": incident_key
+      "incident"=> {
+        "description"=> [coopera_message_prefix, notice].compact.join(' '),
+        "summary"=> incident_key
       }
     }
-    #.tap do |payload|
-    #  payload[:channel] = slack_channel if slack_channel
-    #  payload[:username] = slack_bot_name if slack_bot_name
-    #  payload[:attachments][0][:mrkdwn_in] = %w(text) if markdown_enabled
-    #end
   end
 
     def check_status

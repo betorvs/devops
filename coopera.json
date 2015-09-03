@@ -3,7 +3,7 @@
     "webhook_url": "https://itsm.dev.infra/api/v1/incidents.json",
     "channel": "incident",
     "message_prefix": "sensu alerts",
-    "proxy_addr": "proxy-1.dev.infra",
-    "proxy_port": "3128",
+    "proxy_addr": "",
+    "proxy_port": ""
   }
 }
