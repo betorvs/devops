@@ -1,0 +1,30 @@
+#!/usr/bin/expect
+
+set fid [open /home/rscudeller/.bin/.pass]
+set password [read $fid]
+close $fid
+spawn /usr/bin/ssh rscudeller@[lindex $argv 0] "/bin/cat /etc/os-release"
+expect {
+-re ".*Are.*.*yes.*no.*" {
+send "yes\n"
+exp_continue
+#look for the password prompt
+}
+
+"*?assword:*" {
+send $password
+send "\n"
+exp_continue
+#The expect command will now return
+}
+#"$ " {
+#send "/bin/cat /etc/redhat-release"
+#send "\n"
+#exp_continue
+#}
+#"$ " {
+#send "exit\r"
+#close
+#}
+
+}
