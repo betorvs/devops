@@ -28,7 +28,7 @@ dashboard = {
 };
 
 // Set a title
-dashboard.title = 'Scripted dash';
+dashboard.title = 'grafana.oi.infra';
 
 // Set default time
 // time can be overriden in the url using from/to parameters, but this is
