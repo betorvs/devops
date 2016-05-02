@@ -11,7 +11,13 @@
 #
 # Must have access to the specified elasticsearch node.
 #
-#for i in `curl -s http://localhost:9200/_cat/indices?v|awk '{print $3 }'|egrep -v "index|logstash"` ; do curl -s -XDELETE http://localhost:9200/${i}/ ; done
+# Example: ./elasticsearch-remove-old-indices.sh -e "http://URL:9200" -i 30
+# 
+#
+# Tip:
+# * Remove others index:
+#   for i in `curl -s http://localhost:9200/_cat/indices?v|awk '{print $3 }'|egrep -v "index"|egrep -v "logstash|kibana|perl|phppath|something|webui"`; do curl -s -XDELETE http://localhost:9200/${i}/ ; done
+#
 #
 
 usage()
