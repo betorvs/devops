@@ -6,8 +6,8 @@ http://grafana-host:3000/dashboard/script/nginx-script-dashboard.js?name=server-
 
 Dica:
 
-* linhas 56 até 171: Importei uma row de um grafico qualquer gerado manualmente.
-* linha 132: Alterei o "target", com a seriesName: 
+* linhas 56 até 171: Importei uma row, a partir de um json após ter gerado um gráfico qualquer gerado manualmente.
+* linha 132: Alterei o "target" da row, mudando o hostname ali presente para "seriesName" uma variável: 
 ```
 s/server-short-name-1/" + seriesName + "/g
 ``` 
