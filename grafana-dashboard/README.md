@@ -13,3 +13,9 @@ s/server-short-name-1/" + seriesName + "/g
 ``` 
 
 * O outro arquivo vm.js é um exemplo antigo com vários gráficos no mesmo script dashboard.
+* Novas rows são feitas com este trecho aqui:
+```
+  dashboard.rows.push(
+// Cole a row aqui!!!!
+  );
+```
