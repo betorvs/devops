@@ -3,6 +3,9 @@
 DIR="$PWD/$1"
 
 case $2 in 
+  centos7)
+    SO="centos:centos7"
+    ;;
   centos6)
     SO="centos:centos6"
     ;;

@@ -25,9 +25,9 @@ then
   fi
 fi
 
-REQUIRES=`grep -m 1 requires $SPEC |awk '{ print substr($0, index($0,$3)) }'`
+#REQUIRES=`grep -m 1 requires $SPEC |awk '{ print substr($0, index($0,$3)) }'`
 
-DISTS="centos:centos6"
+DISTS="centos:centos7"
 mkdir -p $PACKAGE
 
 cp $SPEC $TARGZ $PACKAGE/
@@ -41,10 +41,10 @@ set -x
 yum --nogpgcheck -y upgrade
 yum --nogpgcheck -y install rpm-build createrepo tar
 
-if [ -n \"$REQUIRES\" ]; then
-	echo \"yum --nogpgcheck -y install $REQUIRES\"
-	yum --nogpgcheck -y install $REQUIRES
-fi
+#if [ -n \"$REQUIRES\" ]; then
+#	echo \"yum --nogpgcheck -y install $REQUIRES\"
+#	yum --nogpgcheck -y install $REQUIRES
+#fi
 
 # Prepare build dir
 cd /tmp
